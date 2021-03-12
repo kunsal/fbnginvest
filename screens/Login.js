@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Text, StyleSheet, View, Image } from 'react-native';
-import { Container, Form, Item, Input, Content, Label, Button, Spinner } from 'native-base';
-import notify from './utils/notify';
+import { Container, Form, Item, Input, Content, Label, Button, Spinner, Root } from 'native-base';
+import { notify } from './utils/notify';
+import { login } from '../services/auth-service';
 
 class Login extends Component {
   state = { 
@@ -28,7 +29,7 @@ class Login extends Component {
           const favorites = await hotelService.getFavorites();
           this.props.getUserFavs(favorites.data);
           this.setState({email: '', password: ''});
-          this.props.navigation.navigate('SideMenu');
+          //this.props.navigation.navigate('SideMenu');
         } 
       } catch (err) {
         console.log(err);
@@ -44,8 +45,9 @@ class Login extends Component {
 
   render() { 
     return ( 
-      <Container style={{ backgroundColor: '#e0ad0f' }}>
-        <View style={{ alignItems: 'center', paddingTop: 30}}>
+      <Root>
+        <Container style={{ backgroundColor: '#e0ad0f' }}>
+        <View style={{ alignItems: 'center', paddingTop: 20}}>
           <Image source={require('../assets/icon.png')} style={styles.logo} />
           <Text style={styles.appName}>FBNGInvest</Text>
         </View>
@@ -71,6 +73,8 @@ class Login extends Component {
           </Form>
         </Content>
       </Container>
+    </Root>
+      
     );
   }
 }
