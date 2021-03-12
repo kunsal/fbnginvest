@@ -1,33 +1,59 @@
-const url = 'https://localhost:3001/api/v1/user/';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Axios from 'axios';
 
-import store from '../redux/store';
-import { USER_LOGIN } from '../redux/actionTypes';
+const url = 'http://192.168.88.17:3001/api/v1/user/login';
 
-export const login = async (email, password) => {
-  const credentials = { email, password }
-  const endpoint = 'login';
-
+const saveUser = async (user) => {
   try {
-    //const token = await getToken(username, password);
-    const data = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(credentials)
-    }
-    const response = await fetch(url + endpoint, data);
-    const user = await response.json();
-    if ('error' in user) throw new Error(user.error);
-    if (user.code == 200) {
-      // await store.dispatch({type: USER_LOGIN, user});
-      console.log(user);
-      return user;
-    } else {
-      throw new Error(user.message);
-    }
-  } catch (error) {
-    throw new Error(error);
+    const jsonValue = JSON.stringify(user);
+    return await AsyncStorage.setItem('user', jsonValue)
+  } catch (e) {
+    console.log(e);
   }
 }
 
+export const getUser = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('user')
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export const login = async (email, password) => {
+  try {
+    const response = await Axios.post(`${url}`, { email, password });
+  
+    if (response.status === 200) {
+      await saveUser(response.data);
+      return response.data;
+    } else {
+      throw new Error('An error occurred.');
+    }
+  } catch (error) {
+    return error.response.data;
+  }
+
+}
+
+export const isLoggedIn = async () => {
+  try {
+    const value = await AsyncStorage.getItem('user')
+    if(value !== null) {
+      return true;
+    } 
+    return false;
+  } catch(e) {
+    console.log(e);
+  }
+}
+
+export const logout = async () => {
+  try {
+    await AsyncStorage.removeItem('user');
+  } catch(e) {
+    console.log(e);
+  }
+  console.log('Done.')
+}

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Text, StyleSheet, View, Image } from 'react-native';
-import { Container, Form, Item, Input, Content, Label, Button, Spinner, Root } from 'native-base';
+import { Container, Form, Item, Input, Content, Label, Button, Spinner } from 'native-base';
 import { notify } from './utils/notify';
-import { login } from '../services/auth-service';
+import { login, isLoggedIn } from '../services/auth-service';
 
 class Login extends Component {
   state = { 
@@ -10,6 +10,13 @@ class Login extends Component {
     password: '',
     loading: false
   }
+
+  // async componentDidMount() {
+  //   const loggedIn = await isLoggedIn();
+  //   if (loggedIn) {
+  //     this.props.navigate('Home')
+  //   }
+  // }
 
   handleInputChange = (text, field) => {
     this.state[field] = text;
@@ -23,14 +30,10 @@ class Login extends Component {
         const response = await login(email, password);
         if ('error' in response) {
           this.setState({loading: false});
-          return notify(response.message);
+          return notify(response.error);
         } 
-        else {
-          const favorites = await hotelService.getFavorites();
-          this.props.getUserFavs(favorites.data);
-          this.setState({email: '', password: ''});
-          //this.props.navigation.navigate('SideMenu');
-        } 
+        this.setState({email: '', password: ''});
+        // this.props.navigation.navigate('Home');
       } catch (err) {
         console.log(err);
         this.setState({loading: false});
@@ -45,7 +48,7 @@ class Login extends Component {
 
   render() { 
     return ( 
-      <Root>
+      
         <Container style={{ backgroundColor: '#e0ad0f' }}>
         <View style={{ alignItems: 'center', paddingTop: 20}}>
           <Image source={require('../assets/icon.png')} style={styles.logo} />
@@ -73,7 +76,7 @@ class Login extends Component {
           </Form>
         </Content>
       </Container>
-    </Root>
+   
       
     );
   }
